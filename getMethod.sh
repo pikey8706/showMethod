@@ -2,10 +2,13 @@
 
 afile=$1
 method=$2
+showContents=1
+recursive=1
+nextMethod=$method
 
 getMethod() {
 awk "/.+\(/ {
-  if (! /\)\;/) {
+  if (! /\)\;/ && ! /if\ *\t*\(/ && !/for\ *\t*\(/ && ! /while\ *\t*\(/) {
     hit=1; m=0; got_br=0; k=1
   }
 }
@@ -34,10 +37,15 @@ awk "/.+\(/ {
 	  n=split(xname[1], yname, \" \");
 	  if (n) {
 	    print yname[n]
+            if ($recursive) {
+              #print yname[n] >> tmp_mname
+            }
 	  }
  	}
-        for (i=1; i<=k; i++) {
-          print a[i]
+        if ($showContents) {
+            for (i=1; i<=k; i++) {
+              #print a[i]
+            }
         }
       }
     }
@@ -46,4 +54,9 @@ awk "/.+\(/ {
 
 }
 
-getMethod
+while [ ! -z $method ]
+do
+    method=`getMethod`
+    echo $method
+#exit 0
+done
